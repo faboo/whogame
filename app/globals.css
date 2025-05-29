@@ -1,0 +1,167 @@
+:root {
+	--background: black;
+	--foreground: silver;
+}
+
+* {
+	box-sizing: border-box;
+	padding: 0;
+	margin: 0;
+}
+
+html,
+body {
+	max-width: 100vw;
+	overflow-x: hidden;
+}
+
+body {
+	color: var(--foreground);
+	background: var(--background);
+	font-family: Inconsolata,Consolas,Courier,monospace;
+	margin: 1em;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+footer {
+	font-size: smaller;
+}
+
+p, h2, h3 {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+h1 {
+	font-size: 3em;
+	margin-left: 1em;
+}
+
+#stats {
+	width:16em;
+	display: block;
+	position: absolute;
+	top: 1em;
+	right: .5em;
+}
+#stats p {
+	position: absolute;
+	right: 0;
+}
+
+h2 {
+	display: inline-block;
+	text-transform: uppercase;
+	font-size: 1.5em
+}
+h2::after {
+	content: ":";
+}
+#score p {
+	display: inline-block;
+	font-size: 1.5em;
+	text-align: right;
+}
+
+h3 {
+	display: inline-block;
+	text-transform: uppercase;
+}
+h3::after {
+	content: ":";
+}
+#screwDrivers p, #transporters p {
+	display: inline-block;
+	text-align: right;
+}
+
+#board {
+	font-size: 1.1em;
+	position: relative;
+	border-style: solid;
+	border-width: 1px;
+	margin-top: 3em;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 2em;
+
+	width: 50em;
+	height: 25em;
+}
+
+#board > span {
+	font-size: 1em;
+	position: absolute;
+}
+.dalek::after {
+	content: '♟'
+}
+.trash::after {
+	content: '㍇'
+}
+.doctor::after {
+	content: "☃";
+}
+.doctor.dead::after {
+	content: "☠";
+	background: var(--background);
+}
+.doctor.won::after {
+	content: "♖";
+}
+
+.game-over {
+	position: fixed;
+	top: 30vh;
+	left: 20vw;
+	width: 60vw;
+	height: 14em;
+	background: black;
+	color: var(--foreground);
+	border-style: solid;
+	border-width: 2px;
+	border-color: silver;
+	box-sizing: border-box;
+	padding: 1em;
+}
+
+.game-over p {
+	margin: 2em;
+	margin-bottom: 1.5em;
+	text-align: center;
+	font-size: x-large;
+}
+.game-over button {
+	display: block;
+	border-style: solid;
+	border-width: 2px;
+	border-color: var(--foreground);
+	background: var(--background);
+	color: var(--foreground);
+	width: 10em;
+	padding: .5em;
+	margin-left: auto;
+	margin-right: auto;
+	font-family: Inconsolata,Consolas,Courier,monospace;
+	font-size: large;
+}
+.game-over button:active {
+	background: var(--foreground);
+	color: var(--background);
+	font-weight: bold;
+}
+.game-over button:focus {
+	outline-style: solid;
+	outline-color: var(--foreground);
+	outline-width: 2px;
+}
+
+a, a:visited, a:active {
+	color: inherit;
+}
+
+.sound-bible {
+	vertical-align: super;
+	font-size: smaller;
+}
