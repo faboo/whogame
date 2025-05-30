@@ -61,9 +61,11 @@ export default function Who(){
 		}
 
 		if(game.dead){
+			game.playSound('exterminate')
 			terminated.current.showModal()
 		}
 		else if(game.won){
+			game.playSound('tardis')
 			wonLevel.current.showModal()
 		}
 	}
@@ -136,8 +138,8 @@ export default function Who(){
 		<audio id="screwdriver-sound" src="sounds/Basketball Buzzer-SoundBible.com-1863250611.mp3" preload="auto"></audio>
 		<audio id="transporter-sound" src="sounds/Water Drop Sound High-SoundBible.com-1387792987.mp3" preload="auto"></audio>
 		<audio id="crash-sound" src="sounds/Splat-SoundBible.com-1826190667.mp3" preload="auto"></audio>
-		<audio id="exterminate-sound" src="sounds/exterminate.mp3" preload="auto"></audio>
-		<audio id="tardis-sound" src="sounds/tardis.mp3" preload="auto"></audio>
+		<audio id="exterminate-sound" src="https://pandastatic.blob.core.windows.net/drwho/sounds/exterminate.mp3" preload="auto"></audio>
+		<audio id="tardis-sound" src="https://pandastatic.blob.core.windows.net/drwho/sounds/tardis.mp3" preload="auto"></audio>
 	</>
 	)
 }
