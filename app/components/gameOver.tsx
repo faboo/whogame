@@ -1,6 +1,6 @@
-import {Game} from "./game.ts"
+import {RefObject} from "react"
 
-type GameOverProps = {message:string, button:string, onClick:() => void, ref}
+type GameOverProps = {message:string, button:string, onClick:() => void, ref:RefObject<HTMLDialogElement>}
 
 export default function GameOver({message, button, onClick, ref}:GameOverProps){
 	return (

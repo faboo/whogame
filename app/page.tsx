@@ -1,13 +1,13 @@
 "use client"
 
 import './globals.css';
-import {useContext, useState, useEffect, useTransition, useRef} from 'react'
+import {useContext, useState, useEffect, useTransition, useRef, RefObject} from 'react'
 import {Game, GameContext} from './game.ts'
 import Board from './components/board.tsx'
 import Score from './components/score.tsx'
 import GameOver from './components/gameOver.tsx'
 
-const Keypress = 
+const Keypress:{[key: string]: (game:Game) => void} = 
 	{ 'h': game => game.move(-1, 0)
 	, 'l': game => game.move(1, 0)
 	, 'k': game => game.move(0, -1)
@@ -45,11 +45,11 @@ export default function Who(){
 	const [init, setInit] = useState(false)
 	const game:Game = useContext(GameContext)
   const [isPending, startTransition] = useTransition()
-	const terminated = useRef(null)
-	const wonLevel = useRef(null)
+	const terminated:RefObject<HTMLDialogElement> = useRef(null as any)
+	const wonLevel:RefObject<HTMLDialogElement> = useRef(null as any)
 
-	function onKey(event){
-		let handler:() => void|undefined = undefined
+	function onKey(event:KeyboardEvent){
+		let handler:((game:Game) => void)|undefined = undefined
 
 		if(event.key in Keypress)
 			handler = Keypress[event.key]

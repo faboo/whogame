@@ -1,4 +1,4 @@
-import {Game} from "./game.ts"
+import {Game} from "../game.ts"
 
 type BoardProps = {game: Game}
 

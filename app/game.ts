@@ -17,11 +17,35 @@ const TRANSPORTER_POINTS = -25
 
 type Pt = [number, number]
 
+/* TypeScript doesn't (yet) handle map keys that aren't strings or numbers, and Map's key behavior doesn't work for us,
+ * so this veneer will keep our points.
+ */
+class PtMap{
+	_map:{[key: string]: string|number} = { }
+
+	get(point:Pt):string|number {
+		return this._map[String(point)]
+	}
+
+	set(point:Pt, value:string|number):void {
+		this._map[String(point)] = value
+	}
+
+	has(point:Pt):boolean {
+		return String(point) in this._map
+	}
+
+	delete(point:Pt):void {
+		delete this._map[String(point)]
+	}
+}
+
 export class Level{
 	screwDriver = TOTAL_SCREW_DRIVERS
 	transporters = TOTAL_TRANSPORTERS
-	everything:{[key: Pt]: number|string} = { }
-	daleks:Pt[] = []
+	// TODO: Need super implementation that stringifies the Pt
+	everything:PtMap = new PtMap()
+	daleks:(Pt|null)[] = []
 	trash:Pt[] = []
 	player:Pt = [0,0]
 }
@@ -48,21 +72,21 @@ export class Game{
 		this.addPlayer()
 	}
 
-	get won(): bool{
+	get won(): boolean{
 		return this.current.daleks.every(d => !d)
 	}
 
-	get dead(): bool{
-		return this.current.everything[this.current.player] !== PLAYER
+	get dead(): boolean{
+		return this.current.everything.get(this.current.player) !== PLAYER
 	}
 
-	findFreePosition(): void{
+	findFreePosition(): Pt{
 		let position =
 			[ Math.floor(Math.random()*BOARD_WIDTH)
 			, Math.floor(Math.random()*BOARD_HEIGHT)
-			]
+			] as Pt
 
-		while(!position in this.current.everything){
+		while(this.current.everything.has(position)){
 			if(Math.random() < .5)
 				position[0] += 1;
 			else
@@ -84,7 +108,7 @@ export class Game{
 			let trash = this.findFreePosition()
 
 			this.current.trash.push(trash)
-			this.current.everything[trash] = TRASH
+			this.current.everything.set(trash, TRASH)
 
 			totalTrash -= 1
 		}
@@ -97,7 +121,7 @@ export class Game{
 			dalek = this.findFreePosition()
 
 			this.current.daleks.push(dalek)
-			this.current.everything[dalek] = daleks
+			this.current.everything.set(dalek, daleks)
 		}
 	}
 
@@ -105,10 +129,7 @@ export class Game{
 		var player = this.findFreePosition()
 
 		this.current.player = player
-		this.current.everything[player] = PLAYER
-	}
-
-	tick(): void{
+		this.current.everything.set(player, PLAYER)
 	}
 
 	bound(value:number, upper:number): number{
@@ -118,14 +139,14 @@ export class Game{
 	move(horizontal:number, vertical:number): void{
 		let doctor = this.current.player
 
-		delete this.current.everything[doctor]
+		this.current.everything.delete(doctor)
 
 		doctor[0] = this.bound(doctor[0]+horizontal, BOARD_WIDTH)
 		doctor[1] = this.bound(doctor[1]+vertical, BOARD_HEIGHT)
 
 		// If that didn't just kill the player....
-		if(!(doctor in this.current.everything)){
-			this.current.everything[doctor] = PLAYER
+		if(!this.current.everything.has(doctor)){
+			this.current.everything.set(doctor, PLAYER)
 
 			this.tick()
 		}
@@ -141,7 +162,7 @@ export class Game{
 				this.killDalek(doctor[0]+x, doctor[1]+y)
 
 		this.score += SCREW_DRIVER_POINTS;
-		this.current.screwDrivers -= 1;
+		this.current.screwDriver -= 1;
 
 		this.playSound('screwdriver')
 
@@ -155,7 +176,7 @@ export class Game{
 		let doctor = this.current.player
 		let [x, y] = this.findFreePosition()
 
-		delete this.current.everything[doctor]
+		this.current.everything.delete(doctor)
 		doctor[0] = x
 		doctor[1] = y
 		this.score += TRANSPORTER_POINTS
@@ -163,20 +184,20 @@ export class Game{
 		this.playSound('transporter')
 
 		// If that didn't just kill the player....
-		if(!(doctor in this.current.everything)){
-			this.current.everything[doctor] = PLAYER
+		if(!this.current.everything.has(doctor)){
+			this.current.everything.set(doctor, PLAYER)
 
 			this.tick()
 		}
 	}
 
 	killDalek(x:number, y:number): void{
-		let pos = [x, y]
-		let char = this.current.everything[pos]
+		let pos = [x, y] as Pt
+		let char = this.current.everything.get(pos)
 
 		if(typeof char === 'number'){
 			this.current.daleks[char] = null
-			this.current.everything[pos] = TRASH
+			this.current.everything.set(pos, TRASH)
 			this.current.trash.push(pos)
 
 			this.score += DALEK_POINTS
@@ -194,14 +215,14 @@ export class Game{
 
 	moveDalek(index:number): void{
 		let doctor = this.current.player
-		let dalek = this.current.daleks[index]
+		let dalek = this.current.daleks[index] as Pt
 		let dx = doctor[0] - dalek[0]
 		let dy = doctor[1] - dalek[1]
 		let killCount = 0
 		let m:number
 		let inspace:any
 
-		delete this.current.everything[dalek]
+		this.current.everything.delete(dalek)
 
 		if(dx){
 			m = dy/dx
@@ -219,7 +240,7 @@ export class Game{
 			dalek[1] += Math.sign(dy)
 		}
 
-		inspace = this.current.everything[dalek]
+		inspace = this.current.everything.get(dalek)
 
 		if(typeof inspace == 'number'){
 			killCount = 2
@@ -235,7 +256,7 @@ export class Game{
 			this.playSound('crash')
 		}
 		else{
-			this.current.everything[dalek] = index
+			this.current.everything.set(dalek, index)
 		}
 	}
 
@@ -247,8 +268,12 @@ export class Game{
 	}
 
 	playSound(name:string): void{
-		let audio = document.getElementById(`${name}-sound`)
-		audio.play()
+		let audio = document.getElementById(`${name}-sound`) as HTMLAudioElement
+
+		if(audio == null)
+			console.error(`Sound "${name}" not found`)
+		else
+			audio.play()
 	}
 }
 
